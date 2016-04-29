@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>FeedPulse</title>
+
+        <script src="/socket.io/socket.io.js"></script>
+    </head>
+
+    <body>
+        <script>
+            var socket = io();
+            var latestStateHash = null;
+            socket.on('state', resetState);
+            socket.on('response', function(res) {
+                if (res.state && res.hash) resetState(res.state, res.hash);
+            });
+            socket.emit('state');
+
+            function resetState(state, hash) {
+                latestStateHash = hash;
+                document.getElementById('list').innerHTML = state.todos.map(function(todo) {
+                    return '<li>' + todo + '</li>';
+                }).join('');
+            }
+
+            function addIt() {
+                var action = { type: 'add', todo: document.getElementById('todoname').value };
+                socket.emit('action', action, latestStateHash);
+                document.getElementById('todoname').value = '';
+            }
+        </script>
+
+        <ul id="list">
+
+        </ul>
+
+        <form action="#" onsubmit="addIt()">
+            <input id="todoname" />
+            <button type="submit" id="add">Add</button>
+        </form>
+
+    </body>
+</html>
