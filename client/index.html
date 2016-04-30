@@ -15,7 +15,9 @@
             socket.on('response', function(res) {
                 if (res.state && res.hash) resetState(res.state, res.hash);
             });
-            socket.emit('state');
+            socket.on('connect', function() {
+                socket.emit('state');
+            });
 
             function resetState(state, hash) {
                 latestStateHash = hash;
